@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Форма ввода банковской карты</title>
+  <meta charset="UTF-8">
+  <style>
+    /* Стили для изображения банковской карты */
+    #card-image {
+        width: 350px;
+        height: 230px;
+        background-color: #f0f0f0;
+        /*background-image: url("ccc.jpg");*/
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 80%;
+        margin-left: 20px;
+        display: inline-block;
+        border: 5px solid rgb(18, 13, 70);
+        border-radius: 7%;
+    }
+    /* Стили для таблицы */
+    table {
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    /* Стили для логотипов */
+    .logo {
+        width: 70px;
+        height: 38px;
+        display: inline-block;
+        background-color: #f0f0f0;
+                
+    }
+    
+    .box {
+        display: flex;
+        width: auto;
+        align-items: stretch;
+        justify-content: center;
+    }
+
+    .main {
+        width: auto;
+        display: grid;
+        flex-direction: column;
+        justify-items: center;
+    }
+
+    .card-logos {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+      width: auto;
+      height: 50px;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .div_table {
+        width: auto;
+        justify-self: center;
+    }
+
+    h5 {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 10px;
+    }
+
+    .card-info {
+      padding-left: 10px;
+      
+    }
+
+    .card-info-string {
+      min-height: 20px;
+    }
+
+  </style>
+</head>
+<body>
+<div class="main">
+<div class="box">
+<div>
+  <h1>Форма ввода банковской карты</h1>
+  <form id="card-form">
+    <label for="bank-select">Название банка:</label>
+    <select id="bank-select" onchange="updateCardImage()">
+      <option value="none_bank_selected">Не выбрано</option>
+      <option value="sber">СБЕР</option>
+      <option value="tinkoff">Тинькофф</option>
+      <option value="alfa">Альфа</option>
+      <option value="vtb">ВТБ</option>
+    </select>
+    <br>
+    <label for="system-select">Тип платежной системы:</label>
+    <select id="system-select" onchange="updateCardImage()">
+      <option value="none_pay_selected">Не выбрано</option>
+      <option value="visa">VISA</option>
+      <option value="mastercard">MASTERCARD</option>
+      <option value="mir">МИР</option>
+      <option value="applepay">ApplePay</option>
+    </select>
+    <br>
+    <label for="card-number">Номер карты:</label>
+    <input type="text" id="card-number" maxlength="16" oninput="updateCardImage()">
+    <br>
+    <label for="card-holder">Имя держателя карты:</label>
+    <input type="text" id="card-holder" oninput="updateCardImage()">
+    <br>
+    <label for="expiry-date">Месяц и год окончания карты:</label>
+    <input type="text" id="expiry-date" placeholder="мм/гг" oninput="updateCardImage()">
+    <br>
+    <button type="submit">Отправить</button>
+  </form>
+</div>
+<div>
+  <div id="card-image">
+    <div class="card-logos">
+    <img id="bank-logo" class="logo" src="no-logo.jpg">
+    <img id="system-logo" class="logo" src="no-logo.jpg">
+  </div>
+    <div class="card-info">
+    <h5>Номер карты</h5>
+    <div id="card-number-display" class="card-info-string"></div>
+    
+    <h5>Держатель карты</h5>
+    <div id="card-holder-display" class="card-info-string"></div>
+    
+    <h5>Срок действия карты</h5>
+    <div id="expiry-date-display" class="card-info-string"></div>
+  </div>
+  </div>
+</div>
+</div>
+<div class="div_table">
+  <h2>Данные о банковской карте</h2>
+  <table id="card-table">
+    <thead>
+      <tr>
+        <th>Название банка</th>
+        <th>Тип платежной системы</th>
+        <th>Номер карты</th>
+        <th>Имя держателя карты</th>
+        <th>Месяц и год окончания карты</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+</div>
+  <script>
+    var form = document.getElementById("card-form");
+    var bankSelect = document.getElementById("bank-select");
+    var systemSelect = document.getElementById("system-select");
+    var cardNumberInput = document.getElementById("card-number");
+    var cardHolderInput = document.getElementById("card-holder");
+    var expiryDateInput = document.getElementById("expiry-date");
+    var bankLogo = document.getElementById("bank-logo");
+    var systemLogo = document.getElementById("system-logo");
+    var cardNumberDisplay = document.getElementById("card-number-display");
+    var cardHolderDisplay = document.getElementById("card-holder-display");
+    var expiryDateDisplay = document.getElementById("expiry-date-display");
+    var tableBody = document.querySelector("#card-table tbody");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      var bank = bankSelect.value;
+      var system = systemSelect.value;
+      var cardNumber = cardNumberInput.value;
+      var cardHolder = cardHolderInput.value;
+      var expiryDate = expiryDateInput.value;
+      addToTable(bank, system, cardNumber, cardHolder, expiryDate);
+      clearForm();
+    });
+
+    function updateCardImage() {
+      var bank = bankSelect.value;
+      var system = systemSelect.value;
+      var cardNumber = cardNumberInput.value;
+      var cardHolder = cardHolderInput.value;
+      var expiryDate = expiryDateInput.value;
+      
+      if (bank=="none_bank_selected") {
+        console.log(bank);
+        var bankLogoUrl = "no-logo.jpg";
+      }
+      else {
+        var bankLogoUrl = "logo" + bank + ".png";
+      }
+      
+      if (system=="none_pay_selected") {
+        console.log(system);
+        var systemLogoUrl = "no-logo.jpg";
+      }
+      else {
+        var systemLogoUrl = "logo" + system + ".png";
+      }
+      
+      bankLogo.src = bankLogoUrl;
+      systemLogo.src = systemLogoUrl;
+
+      var cardNumberTemp = "";
+     
+      for (let i=0; i<cardNumber.length; i++) {
+        
+        cardNumberTemp = cardNumberTemp + cardNumber[i];
+        
+        if (i == 3 || i == 7 || i == 11) {
+          cardNumberTemp = cardNumberTemp + " ";
+        }
+
+        cardNumberDisplay.innerHTML = cardNumberTemp;
+      }
+      
+      cardHolderDisplay.innerHTML = cardHolder;
+      expiryDateDisplay.innerHTML = expiryDate;
+    }
+
+    function addToTable(bank, system, cardNumber, cardHolder, expiryDate) {
+      var row = document.createElement("tr");
+      var bankCell = document.createElement("td");
+      var systemCell = document.createElement("td");
+      var cardNumberCell = document.createElement("td");
+      var cardHolderCell = document.createElement("td");
+      var expiryDateCell = document.createElement("td");
+      bankCell.innerHTML = bank;
+      systemCell.innerHTML = system;
+      cardNumberCell.innerHTML = cardNumber;
+      cardHolderCell.innerHTML = cardHolder;
+      expiryDateCell.innerHTML = expiryDate;
+      row.appendChild(bankCell);
+      row.appendChild(systemCell);
+      row.appendChild(cardNumberCell);
+      row.appendChild(cardHolderCell);
+      row.appendChild(expiryDateCell);
+      tableBody.appendChild(row);
+    }
+
+    function clearForm() {
+      bankSelect.selectedIndex = 0;
+      systemSelect.selectedIndex = 0;
+      cardNumberInput.value = "";
+      cardHolderInput.value = "";
+      expiryDateInput.value = "";
+      bankLogo.src = "no-logo.jpg";
+      systemLogo.src = "no-logo.jpg";
+      cardNumberDisplay.innerHTML = "";
+      cardHolderDisplay.innerHTML = "";
+      expiryDateDisplay.innerHTML = "";
+    }
+  </script>
+</body>
+</html>
