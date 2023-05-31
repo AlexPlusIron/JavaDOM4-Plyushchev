@@ -171,6 +171,8 @@
     var expiryDateDisplay = document.getElementById("expiry-date-display");
     var tableBody = document.querySelector("#card-table tbody");
 
+    var previousCardNumber = "";
+
     form.addEventListener("submit", function(event) {
       event.preventDefault();
       var bank = bankSelect.value;
@@ -209,18 +211,25 @@
       systemLogo.src = systemLogoUrl;
 
       var cardNumberTemp = "";
-     
-      for (let i=0; i<cardNumber.length; i++) {
-        
-        cardNumberTemp = cardNumberTemp + cardNumber[i];
-        
-        if (i == 3 || i == 7 || i == 11) {
-          cardNumberTemp = cardNumberTemp + " ";
-        }
+      if(cardNumber[cardNumber.length-1].match(/[0-9]/gi)) {
 
-        cardNumberDisplay.innerHTML = cardNumberTemp;
+        for (let i=0; i<cardNumber.length; i++) {
+          
+          cardNumberTemp = cardNumberTemp + cardNumber[i];
+          
+          if (i == 3 || i == 7 || i == 11) {
+            cardNumberTemp = cardNumberTemp + " ";
+          }
+
+          cardNumberDisplay.innerHTML = cardNumberTemp;
+          previousCardNumber = cardNumber;
+        }
+      } 
+       else {
+        alert("Вводите только цифры");
+        cardNumberInput.value = previousCardNumber;
       }
-      
+
       cardHolderDisplay.innerHTML = cardHolder;
       expiryDateDisplay.innerHTML = expiryDate;
     }
