@@ -117,7 +117,7 @@
     <input type="text" id="card-holder" oninput="updateCardImage()">
     <br>
     <label for="expiry-date">Месяц и год окончания карты:</label>
-    <input type="text" id="expiry-date" placeholder="мм/гг" oninput="updateCardImage()">
+    <input type="text" id="expiry-date" placeholder="ммгг" maxlength="4" oninput="updateCardImage()">
     <br>
     <button type="submit">Отправить</button>
   </form>
@@ -172,6 +172,8 @@
     var tableBody = document.querySelector("#card-table tbody");
 
     var previousCardNumber = "";
+    var previouscardHolder = "";
+    var previousexpiryDate = "";
 
     form.addEventListener("submit", function(event) {
       event.preventDefault();
@@ -192,16 +194,14 @@
       var expiryDate = expiryDateInput.value;
       
       if (bank=="none_bank_selected") {
-        console.log(bank);
-        var bankLogoUrl = "no-logo.jpg";
+          var bankLogoUrl = "no-logo.jpg";
       }
       else {
         var bankLogoUrl = "logo" + bank + ".png";
       }
       
       if (system=="none_pay_selected") {
-        console.log(system);
-        var systemLogoUrl = "no-logo.jpg";
+          var systemLogoUrl = "no-logo.jpg";
       }
       else {
         var systemLogoUrl = "logo" + system + ".png";
@@ -211,28 +211,75 @@
       systemLogo.src = systemLogoUrl;
 
       var cardNumberTemp = "";
-      if(cardNumber[cardNumber.length-1].match(/[0-9]/gi)) {
-
-        for (let i=0; i<cardNumber.length; i++) {
-          
-          cardNumberTemp = cardNumberTemp + cardNumber[i];
-          
-          if (i == 3 || i == 7 || i == 11) {
-            cardNumberTemp = cardNumberTemp + " ";
+      if(cardNumber.length == 0) {
+        cardNumberDisplay.innerHTML = "";
+        previousCardNumber = "";
+      }
+      else {
+        if(cardNumber[cardNumber.length-1].match(/[0-9]/gi)) {
+          for (let i=0; i<cardNumber.length; i++) {
+            cardNumberTemp = cardNumberTemp + cardNumber[i];
+            if (i == 3 || i == 7 || i == 11) {
+              cardNumberTemp = cardNumberTemp + " ";
+            }
+            cardNumberDisplay.innerHTML = cardNumberTemp;
+            previousCardNumber = cardNumber;
           }
-
-          cardNumberDisplay.innerHTML = cardNumberTemp;
-          previousCardNumber = cardNumber;
+        } 
+        else {
+          cardNumberInput.value = previousCardNumber;
         }
       } 
-       else {
-        alert("Вводите только цифры");
-        cardNumberInput.value = previousCardNumber;
+
+      var cardHolderTemp = "";
+      if(cardHolder.length == 0) {
+        cardHolderDisplay.innerHTML = "";
+        previouscardHolder = "";
+      }
+      else {
+        if(cardHolder[cardHolder.length-1].match(/[A-Za-z]/gi) || cardHolder[cardHolder.length-1] == " ") {
+          for (let k=0; k<cardHolder.length; k++) {
+            cardHolderTemp = cardHolderTemp + cardHolder[k].toUpperCase();
+            cardHolderDisplay.innerHTML = cardHolderTemp;
+            previouscardHolder = cardHolder;
+          }
+        } 
+        else {
+          cardHolderInput.value = previouscardHolder;
+        }
       }
 
-      cardHolderDisplay.innerHTML = cardHolder;
-      expiryDateDisplay.innerHTML = expiryDate;
-    }
+      var expiryDateTemp = "";
+      if(expiryDate.length == 0) {
+        expiryDateDisplay.innerHTML = "";
+        previousexpiryDate = "";
+      }
+      else {
+        if(expiryDate[expiryDate.length-1].match(/[0-9]/gi)) {
+          if ((expiryDate.length == 1 && expiryDate[0].match(/[0-1]/gi))
+          || (expiryDate.length == 2 && expiryDate[0] == "0" && expiryDate[1].match(/[1-9]/gi))
+          || (expiryDate.length == 2 && expiryDate[0] == "1" && expiryDate[1].match(/[0-2]/gi))
+          || expiryDate.length == 3
+          || expiryDate.length == 4) {
+            for (let j=0; j<expiryDate.length; j++) {
+              expiryDateTemp = expiryDateTemp + expiryDate[j];
+              if (j == 1) {
+                expiryDateTemp = expiryDateTemp + "/";
+              }
+              expiryDateDisplay.innerHTML = expiryDateTemp;
+              previousexpiryDate = expiryDate;
+            }
+          }
+          else {
+           expiryDateInput.value = previousexpiryDate;
+          }
+        }
+      
+        else {
+          expiryDateInput.value = previousexpiryDate;
+        }
+      }
+  }
 
     function addToTable(bank, system, cardNumber, cardHolder, expiryDate) {
       var row = document.createElement("tr");
